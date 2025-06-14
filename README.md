@@ -1,2 +1,5 @@
 # Proyecto-Teclado
-Reposity para Proyecto (ejercicios) de Teclado
+Ejercicio #1 – Teclado.
+
+Rama creada para subir las versiones del codigo.
+
