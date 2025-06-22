@@ -1,58 +1,34 @@
-//Ejercicio #4 – El bar
 #include <iostream>
-
+#include <stdio.h>
+#define TAM 5
 using namespace std;
 
-struct Datos{
+
+int main() {
+    cout << "\tBAR -EL PEPE-" << endl;
+    cout << "Se debe de tener la lista de las ventas en un archivo de texto llamado bar.txt" << endl;
+    cout << "Para indicar que termino el dia, en categoria indicar N y en valor un 0" << endl;
+	float vector[TAM]={0},valor;
 	char categoria;
-	float valor;
-	float ventaMax=0,ventaMin=1000;
-	char catAux;
-	float valAux;
-};
 
-
-int menu();
-
-int main(){
-	menu();
-}
-
-int menu(){
-	Datos barDatos;
-	cout <<"\tBAR -EL PEPE-"<<endl;
-	cout << "Se debe de tener la lista de las ventas en un archivo de texto llamado bar.txt"<<endl;
-	cout<< "Se indica que para indicar que termino el dia, en categoria indicar N y en valor un 0"<<endl;
-
-	FILE *bar = fopen("bar.txt","r");
-	if(bar==NULL){
-		cout <<"Error al abrir el archivo";
-		return 1;
-	}else{
-		
-	cout <<"\tMenu:\n"<<endl;
-	
-	cout <<"Desayuno - D"<<endl;
-	cout <<"Comidas - A"<<endl;
-	cout <<"Meriendas - M"<<endl;
-	cout <<"Copas - C"<<endl;
-
-	
-	while (!feof(bar)){
-
-	fscanf(bar, "%c\t%d", &barDatos.categoria, &barDatos.valor);
-		if (barDatos.categoria != 'N' && barDatos.categoria != 'n' ){
-		barDatos.valAux= barDatos.valor;
-		if(barDatos.valor < barDatos.ventaMin){
-			barDatos.ventaMin = barDatos.valor;
-			barDatos.catAux = barDatos.categoria;
-			}
-		if(barDatos.valor > barDatos.ventaMax){
-			barDatos.ventaMax = barDatos.valor;
-			barDatos.catAux = barDatos.categoria;
-			}	
-		}
-    }
-	 fclose(bar);
+    FILE *bar = fopen("bar.txt", "r");
+    if (bar == NULL) {
+        cout << "Error al abrir el archivo" << endl;
+        return 1;
 	}
+    FILE *salida = fopen("salida.txt", "w");
+    if (salida == NULL) {
+        cout << "Error al abrir el archivo" << endl;
+        return 1;
+	}
+	/*Nota: cada que se vuelva a correr los datos anteriormente
+	 almacenados se van a borrar, esto para tener mas claridad en cada dato guardado*/
+	while(fscanf(bar,"%c %f",&categoria,&valor)==2){
+		if((categoria == 'N' && categoria == 'n')&&valor==0){//Condicion para complobar si se termino el dia ( N 0 )
+			
+		}
+	}
+	
+	
 }
+
