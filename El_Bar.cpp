@@ -5,6 +5,10 @@
 #define TAM 5//numero de categorias existentes
 using namespace std;
 
+const char* categoriaMax(float []);
+const char* categoriaMin(float []);
+
+
 
 int main() {
     cout << "\tBAR -EL PEPE-" << endl;
@@ -33,7 +37,7 @@ int main() {
 	/*Nota: cada que se ejecuta nuevamente se borran los datos 
 	 almacenados anteriormente, esto para tener mas claridad en cada dato guardado*/
 	while(fscanf(bar,"%c %f",&categoria,&valor)==2){
-		if((categoria == 'N' && categoria == 'n')&&valor==0){//Condicion para complobar si se termino el dia ( N 0 )
+		if((categoria == 'N' || categoria == 'n')&&valor==0){//Condicion para complobar si se termino el dia ( N 0 )
 		
 			//Caso base (si es N 0) - Fin del dia
 			
@@ -43,7 +47,8 @@ int main() {
 			}
 			float promVentas = ventasDia / TAM;
 			
-			char categoriaMax,categoriaMin;
+			const char* catMax = categoriaMax(ventas);
+			const char* catMin = categoriaMin(ventas);
 			//ahora evaluar si las ventas de comida superan al promedio de ventas del dia
 			//ventas en 1 hacen referencia a las ventas conseguidas en las comidas
 			char respuesta[2];
@@ -52,16 +57,17 @@ int main() {
 			}else{
 				strcpy(respuesta,"NO");
 			}
+			cout << endl;
 		//mostrar en pantalla
-		cout<<categoriaMax<<"#"<<categoriaMin"#"<<respuesta<<endl;
+		cout<<catMax<<"#"<<catMin<<"#"<<respuesta<<endl;
 		
 		//escribir en archivo nuevo
-		fprint(salida,"%s#%s#%s\n",categoriaMax,categoriaMin,respuesta);
+		fprintf(salida,"%s#%s#%s\n",catMax,catMin,respuesta);
 	 
 		//inicializar las ventas en 0 para no tener datos almacenados de otros dias
 		for(int i = 0; i<TAM; i++){
 			ventas[i]=0;
-			
+			}
 		}else{
 			//acumilar las ventas de cada categoria segun su codigo
 			bool encontrada = false ;
@@ -101,19 +107,42 @@ int main() {
 					encontrada = false;
 					break;
 				}
-			}
-
-		}else{
+			
+		}
 			//en caso de que no sea N 0
 			
 			
-		}
+			float ventasDia = 0;
+			for (int i= 0; i< TAM; i++){
+				ventasDia += ventas[i];//se guarda el costo segun la categoria
+			}
+			float promVentas = ventasDia / TAM;
+			
+			const char* catMax = categoriaMax(ventas);
+			const char* catMin = categoriaMin(ventas);
+			//ahora evaluar si las ventas de comida superan al promedio de ventas del dia
+			//ventas en 1 hacen referencia a las ventas conseguidas en las comidas
+			char respuesta[2];
+			if(ventas[1] > promVentas){
+				strcpy(respuesta,"SI");
+			}else{
+				strcpy(respuesta,"NO");
+			}
+			cout << endl;
+		//mostrar en pantalla
+		cout<<catMax<<"#"<<catMin<<"#"<<respuesta<<endl;
 		
-		
-	}
-
+		//escribir en archivo nuevo
+		fprintf(salida,"%s#%s#%s\n",catMax,catMin,respuesta);	
+		}	
 	
+
+	fclose(bar);
+	fclose(salida);
+	return 0;
 }
+
+
 
 //funcion para mostrar categoria maxima
 //se declara const porque no se debe de modificar los nombres
@@ -124,14 +153,119 @@ const char* categoriaMax(float ventas[]){
 	int indiceMax=0;//indica la posicion en el arreglo del valor maximo
 	
 	
-	for (int i=0; i<TAM; i++){
-		if(ventas[i]>valorMax){
-			vslorMax = ventas[i];
+	for (int i=1; i<TAM; i++){
+		if(ventas[i]>valorMax){//evalua si las ventas de cierta posicion son mayores a las guardadas en valorMax
+			valorMax = ventas[i];
 			indiceMax = i;
 			contMax= 1;
-		}else if(ventas[i]==valorMax){
+			/*en caso de serlo se almacena este como 
+			  el valor maximo, se guarda la posicion en la que se
+			  encuentra y el contador se queda en uno indicando
+			  que solo hay un valor maximo*/
+			  
+			  
+		}else if(ventas[i]==valorMax){//caso si es que es empate entre mayores ventas
 			contMax ++;
 		}
 	}
+	/*se evalua si es un empate y en caso de serlo se le
+	 asigna la cadena de EMPATE a la variable nombre y se retorna esta variable*/
+	if (contMax > 1){
+		strcpy(nombre,"EMPATE");
+	}
 	
+	/*en caso de no ser un empate se 
+	retornara el nombre de la categoria con el valor maximo*/
+	switch(indiceMax){
+		
+		case 0:
+			strcpy(nombre,"DESAYUNOS");
+			break;
+			
+		case 1:
+			strcpy(nombre,"COMIDAs");
+			break;
+			
+		case 2:
+			strcpy(nombre,"MERIENDAs");
+			break;
+			
+		case 3:
+			strcpy(nombre,"CENAS");
+			break;
+		
+		case 4:
+			strcpy(nombre,"COPAS");
+			break;
+			
+		default:
+			strcpy(nombre,"NINGUO");
+			break;
+	}
+	return nombre;
 }
+
+
+//funcion para mostrar categoria maxima
+//se declara const porque no se debe de modificar los nombres
+const char* categoriaMin(float ventas[]){
+	char nombre[20];
+	float valorMin = ventas[0];//se empieza con el valor min de la primera posicion 
+	int contMin=1;//sirve para detectar si hay empates en los valores minimos
+	int indiceMin=0;//indica la posicion en el arreglo del valor minimo
+	
+	
+	for (int i=1; i<TAM; i++){
+		if(ventas[i]<valorMin){//evalua si las ventas de cierta posicion son menores a las guardadas en valorMin
+			valorMin = ventas[i];
+			indiceMin = i;
+			contMin= 1;
+			/*en caso de serlo se almacena este como 
+			  el valor minimo, se guarda la posicion en la que se
+			  encuentra y el contador se queda en uno indicando
+			  que solo hay un valor minimo*/
+			  
+			  
+		}else if(ventas[i]==valorMin){//caso si es que es empate entre los minimas ventas
+			contMin ++;
+		}
+	}
+	/*se evalua si es un empate y en caso de serlo se le
+	 asigna la cadena de EMPATE a la variable nombre y se retorna esta variable*/
+	if (contMin > 1){
+		strcpy(nombre,"EMPATE");
+	}
+	
+	/*en caso de no ser un empate se 
+	retornara el nombre de la categoria con el valor minimo*/
+	switch(indiceMin){
+		
+		case 0:
+			strcpy(nombre,"DESAYUNOS");
+			break;
+			
+		case 1:
+			strcpy(nombre,"COMIDAs");
+			break;
+			
+		case 2:
+			strcpy(nombre,"MERIENDAs");
+			break;
+			
+		case 3:
+			strcpy(nombre,"CENAS");
+			break;
+		
+		case 4:
+			strcpy(nombre,"COPAS");
+			break;
+			
+		default:
+			strcpy(nombre,"NINGUO");
+			break;
+	}
+	return nombre;
+}
+
+
+
