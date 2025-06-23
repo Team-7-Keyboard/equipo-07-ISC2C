@@ -34,7 +34,9 @@ int main() {
 	 almacenados anteriormente, esto para tener mas claridad en cada dato guardado*/
 	while(fscanf(bar,"%c %f",&categoria,&valor)==2){
 		if((categoria == 'N' && categoria == 'n')&&valor==0){//Condicion para complobar si se termino el dia ( N 0 )
+		
 			//Caso base (si es N 0) - Fin del dia
+			
 			float ventasDia = 0;
 			for (int i= 0; i< TAM; i++){
 				ventasDia += ventas[i];//se guarda el costo segun la categoria
@@ -71,13 +73,65 @@ int main() {
 					encontrada = true;
 					break;
 					
+				//Caso de los comidas
+				case 'A':
+					ventas[1] +=valor;
+					encontrada = true;
+					break;
 					
+				//Caso de los meriendas
+				case 'M':
+					ventas[2] +=valor;
+					encontrada = true;
+					break;
+					
+				//Caso de los cenas
+				case 'I':
+					ventas[3] +=valor;
+					encontrada = true;
+					break;
+					
+				//Caso de los copas
+				case 'C':
+					ventas[4] +=valor;
+					encontrada = true;
+					break;
+					
+				default:
+					encontrada = false;
+					break;
+				}
 			}
-		}
 
+		}else{
+			//en caso de que no sea N 0
+			
+			
 		}
+		
+		
 	}
 
 	
 }
 
+//funcion para mostrar categoria maxima
+//se declara const porque no se debe de modificar los nombres
+const char* categoriaMax(float ventas[]){
+	char nombre[20];
+	float valorMax = ventas[0];//se empieza con el valor maximo de la primera posicion 
+	int contMax=1;//sirve para detectar si hay empates en los valores maximos
+	int indiceMax=0;//indica la posicion en el arreglo del valor maximo
+	
+	
+	for (int i=0; i<TAM; i++){
+		if(ventas[i]>valorMax){
+			vslorMax = ventas[i];
+			indiceMax = i;
+			contMax= 1;
+		}else if(ventas[i]==valorMax){
+			contMax ++;
+		}
+	}
+	
+}
