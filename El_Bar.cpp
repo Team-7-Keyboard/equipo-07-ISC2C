@@ -51,6 +51,8 @@ int main() {
 			const char* catMin = categoriaMin(ventas);
 			//ahora evaluar si las ventas de comida superan al promedio de ventas del dia
 			//ventas en 1 hacen referencia a las ventas conseguidas en las comidas
+			if(!(strcmp(catMax,"EMPATE")==0 && strcmp(catMin,"EMPATE")==0)){//ignorar casos en los que es EMPATE#EMPATE#y
+			
 			char respuesta[3];
 			if(ventas[1] > promVentas){
 				strcpy(respuesta,"SI");
@@ -61,7 +63,7 @@ int main() {
 		cout<<catMax<<"#"<<catMin<<"#"<<respuesta<<endl;
 		//escribir en archivo nuevo
 		fprintf(salida,"%s#%s#%s\n",catMax,catMin,respuesta);
-	 
+		} 
 		//inicializar las ventas en 0 para no tener datos almacenados de otros dias
 		for(int i = 0; i<TAM; i++){
 			ventas[i]=0;
@@ -102,8 +104,8 @@ int main() {
 		}
 			//en caso de que no sea N 0
 			
-			
-			float ventasDia = 0;
+	}		
+		float ventasDia = 0;
 			for (int i= 0; i< TAM; i++){
 				ventasDia += ventas[i];//se guarda el costo segun la categoria
 			}
@@ -113,6 +115,7 @@ int main() {
 			const char* catMin = categoriaMin(ventas);
 			//ahora evaluar si las ventas de comida superan al promedio de ventas del dia
 			//ventas en 1 hacen referencia a las ventas conseguidas en las comidas
+			if(!(strcmp(catMax,"EMPATE")==0 && strcmp(catMin,"EMPATE")==0)){//ignorar casos en los que es EMPATE#EMPATE#
 			char respuesta[3];
 			if(ventas[1] > promVentas){
 				strcpy(respuesta,"SI");
@@ -125,9 +128,7 @@ int main() {
 		
 		//escribir en archivo nuevo
 		fprintf(salida,"%s#%s#%s\n",catMax,catMin,respuesta);	
-		}	
-	
-
+		}
 	fclose(bar);
 	fclose(salida);
 	return 0;
