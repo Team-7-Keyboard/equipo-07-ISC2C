@@ -36,7 +36,7 @@ int main() {
 	
 	/*Nota: cada que se ejecuta nuevamente se borran los datos 
 	 almacenados anteriormente, esto para tener mas claridad en cada dato guardado*/
-	while(fscanf(bar,"%c %f",&categoria,&valor)==2){
+	while(fscanf(bar," %c %f",&categoria,&valor)==2){
 		if((categoria == 'N' || categoria == 'n')&&valor==0){//Condicion para complobar si se termino el dia ( N 0 )
 		
 			//Caso base (si es N 0) - Fin del dia
@@ -51,16 +51,14 @@ int main() {
 			const char* catMin = categoriaMin(ventas);
 			//ahora evaluar si las ventas de comida superan al promedio de ventas del dia
 			//ventas en 1 hacen referencia a las ventas conseguidas en las comidas
-			char respuesta[2];
+			char respuesta[3];
 			if(ventas[1] > promVentas){
 				strcpy(respuesta,"SI");
 			}else{
 				strcpy(respuesta,"NO");
 			}
-			cout << endl;
 		//mostrar en pantalla
 		cout<<catMax<<"#"<<catMin<<"#"<<respuesta<<endl;
-		
 		//escribir en archivo nuevo
 		fprintf(salida,"%s#%s#%s\n",catMax,catMin,respuesta);
 	 
@@ -70,41 +68,34 @@ int main() {
 			}
 		}else{
 			//acumilar las ventas de cada categoria segun su codigo
-			bool encontrada = false ;
 			switch (categoria){
 				
 				//Caso de los desayunos
 				case 'D':
 					ventas[0] +=valor;
-					encontrada = true;
 					break;
 					
 				//Caso de los comidas
 				case 'A':
 					ventas[1] +=valor;
-					encontrada = true;
 					break;
 					
 				//Caso de los meriendas
 				case 'M':
 					ventas[2] +=valor;
-					encontrada = true;
 					break;
 					
 				//Caso de los cenas
 				case 'I':
 					ventas[3] +=valor;
-					encontrada = true;
 					break;
 					
 				//Caso de los copas
 				case 'C':
 					ventas[4] +=valor;
-					encontrada = true;
 					break;
 					
 				default:
-					encontrada = false;
 					break;
 				}
 			
@@ -122,13 +113,13 @@ int main() {
 			const char* catMin = categoriaMin(ventas);
 			//ahora evaluar si las ventas de comida superan al promedio de ventas del dia
 			//ventas en 1 hacen referencia a las ventas conseguidas en las comidas
-			char respuesta[2];
+			char respuesta[3];
 			if(ventas[1] > promVentas){
 				strcpy(respuesta,"SI");
 			}else{
 				strcpy(respuesta,"NO");
 			}
-			cout << endl;
+		
 		//mostrar en pantalla
 		cout<<catMax<<"#"<<catMin<<"#"<<respuesta<<endl;
 		
@@ -147,7 +138,7 @@ int main() {
 //funcion para mostrar categoria maxima
 //se declara const porque no se debe de modificar los nombres
 const char* categoriaMax(float ventas[]){
-	char nombre[20];
+	static char nombre[20];
 	float valorMax = ventas[0];//se empieza con el valor maximo de la primera posicion 
 	int contMax=1;//sirve para detectar si hay empates en los valores maximos
 	int indiceMax=0;//indica la posicion en el arreglo del valor maximo
@@ -171,7 +162,7 @@ const char* categoriaMax(float ventas[]){
 	/*se evalua si es un empate y en caso de serlo se le
 	 asigna la cadena de EMPATE a la variable nombre y se retorna esta variable*/
 	if (contMax > 1){
-		strcpy(nombre,"EMPATE");
+		return"EMPATE";
 	}
 	
 	/*en caso de no ser un empate se 
@@ -179,37 +170,31 @@ const char* categoriaMax(float ventas[]){
 	switch(indiceMax){
 		
 		case 0:
-			strcpy(nombre,"DESAYUNOS");
-			break;
+			return"DESAYUNOS";
 			
 		case 1:
-			strcpy(nombre,"COMIDAs");
-			break;
+			return"COMIDAS";
 			
 		case 2:
-			strcpy(nombre,"MERIENDAs");
-			break;
+			return"MERIENDAS";
 			
 		case 3:
-			strcpy(nombre,"CENAS");
-			break;
+			return"CENAS";
 		
 		case 4:
-			strcpy(nombre,"COPAS");
-			break;
+			return"COPAS";
 			
 		default:
-			strcpy(nombre,"NINGUO");
-			break;
+			return"NINGUNO";
+
 	}
-	return nombre;
 }
 
 
 //funcion para mostrar categoria maxima
 //se declara const porque no se debe de modificar los nombres
 const char* categoriaMin(float ventas[]){
-	char nombre[20];
+	static char nombre[20];
 	float valorMin = ventas[0];//se empieza con el valor min de la primera posicion 
 	int contMin=1;//sirve para detectar si hay empates en los valores minimos
 	int indiceMin=0;//indica la posicion en el arreglo del valor minimo
@@ -233,7 +218,7 @@ const char* categoriaMin(float ventas[]){
 	/*se evalua si es un empate y en caso de serlo se le
 	 asigna la cadena de EMPATE a la variable nombre y se retorna esta variable*/
 	if (contMin > 1){
-		strcpy(nombre,"EMPATE");
+		return "EMPATE";
 	}
 	
 	/*en caso de no ser un empate se 
@@ -241,30 +226,23 @@ const char* categoriaMin(float ventas[]){
 	switch(indiceMin){
 		
 		case 0:
-			strcpy(nombre,"DESAYUNOS");
-			break;
+			return "DESAYUNOS";
 			
 		case 1:
-			strcpy(nombre,"COMIDAs");
-			break;
+			return"COMIDAS";
 			
 		case 2:
-			strcpy(nombre,"MERIENDAs");
-			break;
+			return "MERIENDAS";
 			
 		case 3:
-			strcpy(nombre,"CENAS");
-			break;
+			return"CENAS";
 		
 		case 4:
-			strcpy(nombre,"COPAS");
-			break;
+			return"COPAS";
 			
 		default:
-			strcpy(nombre,"NINGUO");
-			break;
+			return"NINGUNO";
 	}
-	return nombre;
 }
 
 
