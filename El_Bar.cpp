@@ -180,24 +180,28 @@ void procesarDatos(vector<string>& resultados) {
             const char* catMax = categoriaMax(ventas);
             const char* catMin = categoriaMin(ventas);
 
-            if (!(strcmp(catMax, "EMPATE") == 0 && strcmp(catMin, "EMPATE") == 0)) {
-                char respuesta[4];
-                strcpy_s(respuesta, sizeof(respuesta), (ventas[1] > promVentas) ? "SI" : "NO");
+           if (!(strcmp(catMax, "EMPATE") == 0 && strcmp(catMin, "EMPATE") == 0)) {
+    			char respuesta[4];
+    			if (ventas[1] > promVentas) {
+      			  strcpy_s(respuesta, sizeof(respuesta), "SI");
+    			} else {
+      			  strcpy_s(respuesta, sizeof(respuesta), "NO");
+    			}
+    			char linea[100];
+    			snprintf(linea, sizeof(linea), "%s#%s#%s", catMax, catMin, respuesta);
+   				resultados.push_back(string(linea));
+    			fprintf(salida, "%s\n", linea);
+			}
 
-                char linea[100];
-                snprintf(linea, sizeof(linea), "%s#%s#%s", catMax, catMin, respuesta);
-                resultados.push_back(string(linea));
-                fprintf(salida, "%s\n", linea);
-            }
             for (int i = 0; i < TAM; i++) ventas[i] = 0;
         }
         else {
             switch (categoria) {
-            case 'D': case 'd': ventas[0] += valor; break;
-            case 'A': case 'a': ventas[1] += valor; break;
-            case 'M': case 'm': ventas[2] += valor; break;
-            case 'I': case 'i': ventas[3] += valor; break;
-            case 'C': case 'c': ventas[4] += valor; break;
+            case 'D': ventas[0] += valor; break;
+            case 'A': ventas[1] += valor; break;
+            case 'M': ventas[2] += valor; break;
+            case 'I': ventas[3] += valor; break;
+            case 'C': ventas[4] += valor; break;
             }
         }
     }
