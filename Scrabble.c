@@ -84,6 +84,7 @@ void guardarPalabra(char *palabra); // Guarda el tablero y el puntaje en unn arc
 void guardarPartida(struct Juego partida[2]); // Juardamos las palabras y puntos de cada jugador en un .txt
 void liberar(struct Puntaje **inicio); // Liberamos la memoria reservada de las estructuras
 void convertirPalabra(char *point, int *puntos, int divisor, int *k);
+bool doblePalabra(char *palabra);
 
 // Funciones para saber si es una casilla especial
 bool esTriplePalabra(int y, int x);
@@ -310,22 +311,10 @@ bool colocarPalabra (char tablero[TAM][TAM], int x, int y, enum Orientacion o, c
     }misma_letra;
     misma_letra.letras_repetidas = (char*)calloc(TAM, sizeof(char));
 
-    FILE *archivo = fopen("Scrabble_Score.txt", "r");
-    if(!archivo){
-        return false;
-    }
-
     // Palabra Repetida
-    char *arch_palabra = (char*)calloc(TAM, sizeof(char));
-    while(fscanf(archivo, "%s", arch_palabra) == 1){
-        if(strcmp(arch_palabra, palabra) == 0){
-            fclose(archivo);
-            free(arch_palabra);
-            return false; // Palabra ya usada
-        }
+    if(doblePalabra(palabra)){
+        return false; // Palabra ya usada
     }
-    free(arch_palabra);
-    fclose(archivo);
 
     // Palabra Existe en el Diccionario
     if(!esPalabra(palabra)){
@@ -624,4 +613,22 @@ void convertirPalabra(char *point, int *puntos, int divisor, int *k){ // Convier
     if(divisor == 1) {
         point[*k] = '\0';
     }
+}
+
+bool doblePalabra(char *palabra){
+    FILE *archivo = fopen("Scrabble_Score.txt", "r");
+    if(!archivo){
+        return true;
+    }
+    char *arch_palabra = (char*)calloc(TAM, sizeof(char));
+    while(fscanf(archivo, "%s", arch_palabra) == 1){
+        if(strcmp(arch_palabra, palabra) == 0){
+            fclose(archivo);
+            free(arch_palabra);
+            return true; // Palabra ya usada
+        }
+    }
+    free(arch_palabra);
+    fclose(archivo);
+    return false;
 }
