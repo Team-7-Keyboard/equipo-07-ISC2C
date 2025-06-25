@@ -15,12 +15,14 @@
 #define EJE_X 1080
 #define EJE_Y 400
 
+enum Estado{ACTIVO, FINAL};
+
 struct Datos{
     int peso1, peso2;
     int distancia1, distancia2;
 };
 
-bool calcularEquilibrio(FILE *archivo_entrada, FILE *archivo_salida, int *peso, ALLEGRO_FONT *texto); // Funcion recursiva que recorre el archivo, guarda y calcula los datos
+bool calcularEquilibrio(FILE *archivo_entrada, FILE *archivo_salida, int *peso, ALLEGRO_FONT *texto, enum Estado *a); // Funcion recursiva que recorre el archivo, guarda y calcula los datos
 void recorrerModulo1(int distancia1, ALLEGRO_FONT *texto);
 void recorrerModulo2(int distancia2, ALLEGRO_FONT *texto);
 void balanzaDerecha(int peso2, int distancia2, ALLEGRO_FONT *texto);
@@ -34,7 +36,8 @@ int main(){
     }
 
     int peso, i = 1; // Peso (que va a tomar el valor de peso1 y peso2), y el i es el numero del modulo a analizar
-    bool run = true; 
+    bool run = true;
+    enum Estado a = ACTIVO;
     int j = 0, k = 0;
     FILE *archivo_entrada = fopen("Balanza.txt", "r");
     FILE *archivo_salida = fopen("Moviles_Equilibrados.txt", "w");
@@ -61,10 +64,10 @@ int main(){
         al_flip_display();
         al_rest(2.0);
 
-        if(calcularEquilibrio(archivo_entrada, archivo_salida, &peso, texto)){ // Calculamos balanza por balanza
+        if(calcularEquilibrio(archivo_entrada, archivo_salida, &peso, texto, &a)){ // Calculamos balanza por balanza
             fprintf(archivo_salida, " Movil %d: EQUILIBRADO\n\n", i); // Si esta equilibrada (recibimos true)
         }else{
-            if(peso != -1){ // Cuando es -1 es porque hemos llegado a la linea 0000 (fin del archivo)
+            if(a == ACTIVO){ // Cuando es -1 es porque hemos llegado a la linea 0000 (fin del archivo)
                 fprintf(archivo_salida, " Movil %d: NO EQUILIBRADO\n\n", i); // Si no esta equilibrada (recibimos false)
             }else{
                 run = false; // Dejamos de ejecutar cuando lleguemos a la linea 0000 (peso == -1)
@@ -81,14 +84,14 @@ int main(){
     return 0;
 }
 
-bool calcularEquilibrio(FILE *archivo_entrada, FILE *archivo_salida, int *peso, ALLEGRO_FONT *texto){
+bool calcularEquilibrio(FILE *archivo_entrada, FILE *archivo_salida, int *peso, ALLEGRO_FONT *texto, enum Estado *a){
     struct Datos datos; // Crea nuevas variables de datos en cada recursion
     al_clear_to_color(al_map_rgb(227, 215, 206));
     al_draw_filled_rectangle(0, EJE_Y-80, EJE_X, EJE_Y, al_map_rgb(115, 108, 102));
 
     fscanf(archivo_entrada, "%d %d %d %d", &datos.peso1, &datos.distancia1, &datos.peso2, &datos.distancia2); // Guarda los datos de la linea en las variables respectivas
     if(datos.peso1 == 0 && datos.peso2 == 0 && datos.distancia1 == 0 && datos.distancia2 == 0){ // Verifica que no hayamos llegado al final del archivo
-        *peso = -1; // De ser el caso, el peso toma el valor de -1 (asi el main sabra que hemos llegado al final)
+        *a = FINAL; // De ser el caso, el peso toma el valor de -1 (asi el main sabra que hemos llegado al final)
         return false; // Fin del archivo
     }
 
@@ -97,7 +100,7 @@ bool calcularEquilibrio(FILE *archivo_entrada, FILE *archivo_salida, int *peso, 
     if(datos.peso1 == 0){ // Si el peso1 es igual a 0, quiere decir que existe un submodulo del lado izquierdo de la balanza
         balanzaDerecha(datos.peso2, datos.distancia2, texto);
         recorrerModulo1(datos.distancia1, texto);
-        if(!calcularEquilibrio(archivo_entrada, archivo_salida, &datos.peso1, texto)){ // Llamamos a la funcion, para calcular el submodulo
+        if(!calcularEquilibrio(archivo_entrada, archivo_salida, &datos.peso1, texto, a)){ // Llamamos a la funcion, para calcular el submodulo
             al_clear_to_color(al_map_rgb(227, 215, 206));
             al_draw_filled_rectangle(0, EJE_Y-80, EJE_X, EJE_Y, al_map_rgb(115, 108, 102));
             balanzaIzquierda(datos.peso1, datos.distancia1, texto);
@@ -115,7 +118,7 @@ bool calcularEquilibrio(FILE *archivo_entrada, FILE *archivo_salida, int *peso, 
     if(datos.peso2 == 0){ // Si el peso2 es igual a 0, quiere decir que existe un submodulo del lado derecho de la balanza
         balanzaIzquierda(datos.peso1, datos.distancia1, texto);
         recorrerModulo2(datos.distancia2, texto);
-        if(!calcularEquilibrio(archivo_entrada, archivo_salida, &datos.peso2, texto)){ // Llamamos a la funcion, para calcular el submodulo
+        if(!calcularEquilibrio(archivo_entrada, archivo_salida, &datos.peso2, texto, a)){ // Llamamos a la funcion, para calcular el submodulo
             al_clear_to_color(al_map_rgb(227, 215, 206));
             al_draw_filled_rectangle(0, EJE_Y-80, EJE_X, EJE_Y, al_map_rgb(115, 108, 102));
             balanzaIzquierda(datos.peso1, datos.distancia1, texto);
@@ -292,4 +295,5 @@ void recorrerArriba(){
         al_rest(0.1);
     }
 }
+
 
