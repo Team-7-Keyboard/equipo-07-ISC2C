@@ -30,7 +30,6 @@ int main(){
 
     int peso, i = 1; // Peso (que va a tomar el valor de peso1 y peso2), y el i es el numero del modulo a analizar
     bool run = true; 
-    char *vuelta = (char*)calloc(30, sizeof(char));
     int j = 0, k = 0;
     FILE *archivo_entrada = fopen("Balanza.txt", "r");
     FILE *archivo_salida = fopen("Moviles_Equilibrados.txt", "w");
@@ -70,7 +69,6 @@ int main(){
     }
     // Liberamos
     fclose(archivo_entrada);
-    free(vuelta);
     fclose(archivo_salida);
     al_destroy_font(texto);
     al_destroy_display(display);
