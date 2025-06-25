@@ -612,19 +612,20 @@ void convertirPalabra(char *point, int *puntos, int divisor, int *k){ // Convier
 }
 
 bool doblePalabra(char *palabra){
-    FILE *archivo = fopen("Scrabble_Score.txt", "r");
-    if(!archivo){
-        return true;
-    }
-    char *arch_palabra = (char*)calloc(TAM, sizeof(char));
-    while(fscanf(archivo, "%s", arch_palabra) == 1){
-        if(strcmp(arch_palabra, palabra) == 0){
-            fclose(archivo);
-            free(arch_palabra);
-            return true; // Palabra ya usada
+        FILE *archivo = fopen("Scrabble_Score.txt", "r");
+        if(!archivo){
+            return true;
         }
+        char *arch_palabra = (char*)calloc(TAM, sizeof(char));
+        while(fscanf(archivo, "%s", arch_palabra) == 1){
+            if(strcmp(arch_palabra, palabra) == 0){
+                fclose(archivo);
+                free(arch_palabra);
+                return true; // Palabra ya usada
+            }
+        }
+        free(arch_palabra);
+        fclose(archivo);
+        return false;
     }
-    free(arch_palabra);
-    fclose(archivo);
-    return false;
-}
+
