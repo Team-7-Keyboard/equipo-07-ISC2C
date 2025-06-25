@@ -604,11 +604,7 @@ void convertirPalabra(char *point, int *puntos, int divisor, int *k){ // Convier
         convertirPalabra(point, puntos, divisor*10, k); // Quiere decir que el numero es diez veces mas grande
     }
     int num = (*puntos)/divisor;
-    printf("\n%d\n", *k);
-    printf("\n%d\n", *puntos);
-    printf("\n%c\n", num+'0');
     point[(*k)++] = num + '0'; // Agregamos unidad por unidad
-    printf("\n%s\n", point);
     (*puntos) -= (num*divisor);
     if(divisor == 1) {
         point[*k] = '\0';
