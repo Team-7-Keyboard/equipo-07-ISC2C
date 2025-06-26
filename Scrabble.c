@@ -87,6 +87,7 @@ void liberar(struct Puntaje **inicio); // Liberamos la memoria reservada de las 
 void convertirPalabra(char *point, int *puntos, int divisor, int *k);
 bool doblePalabra(char *palabra);
 void mostrarMarcador(struct Juego partida[2], ALLEGRO_FONT *texto);
+void mostrarInstrucciones(ALLEGRO_EVENT_QUEUE *evento);
 
 // Funciones para saber si es una casilla especial
 bool esTriplePalabra(int y, int x);
@@ -131,6 +132,7 @@ int main(){
     ALLEGRO_FONT *texto = al_load_ttf_font("frisk.ttf", 30, 0); // Crea una fuente de texto
     ALLEGRO_EVENT ev; // Recibe los eventos
     if(!display || !evento || !texto){ // Iniciamos las variables ALLEGRO
+        printf("Error al cargar un archivo.\nEs posible que requiera el archivo frisk.ttf para ejecutar el programa.\n");
         return -1;
     }
 
@@ -138,7 +140,9 @@ int main(){
     al_register_event_source(evento, al_get_keyboard_event_source());
     al_register_event_source(evento, al_get_mouse_event_source());
     al_register_event_source(evento, al_get_display_event_source(display));
-    
+    mostrarTablero(tablero, texto, columna, fila, palabra, o, player);
+    mostrarInstrucciones(evento);
+    al_clear_to_color(al_map_rgb(0,0,0));
     while(run){ // Avanza hasta que un evento cambie la variable run
         mostrarTablero(tablero, texto, columna, fila, palabra, o, player);
         while(al_get_next_event(evento, &ev)){ // Saca los eventos guardados en la cola de eventos
@@ -190,8 +194,6 @@ int main(){
                                     score = puntos;
                                     point[k++] = '+';
                                     convertirPalabra(point, &score, 1, &k);
-                                    
-                                    printf("\ntodo bien\n");
                                     for(int i=0; i<10; i++){
                                         mostrarTablero(tablero, texto, columna, fila, palabra, o, player);
                                         al_draw_text(texto, al_map_rgb(255,255,255), 5*CASILLA, (5*CASILLA) - (i*10), 0, point);
@@ -637,4 +639,28 @@ void mostrarMarcador(struct Juego partida[2], ALLEGRO_FONT *texto){
     al_destroy_font(archivo);
     free(jugador1);
     free(jugador2);
+}
+
+void mostrarInstrucciones(ALLEGRO_EVENT_QUEUE *evento){
+    bool run = true;
+    ALLEGRO_EVENT ev;
+    while(run){
+        if(al_get_next_event(evento, &ev)){
+            if(ev.type == ALLEGRO_EVENT_KEY_CHAR){
+                run = false;
+            }
+        }
+        al_draw_filled_rectangle(CASILLA*1, CASILLA*3, CASILLA*8, CASILLA*6, al_map_rgb(222,206,189));
+        ALLEGRO_FONT *instrucciones = al_create_builtin_font();
+        al_draw_text(instrucciones, al_map_rgb(39,36,30), CASILLA*1.5 + 10, CASILLA*3 +10, 0, "1. Comience desde casilla (5,5)");
+        al_draw_text(instrucciones, al_map_rgb(39,36,30), CASILLA*1.5 + 10, CASILLA*3 +30, 0, "2. Solo Palabras de const Diccionario.");
+        al_draw_text(instrucciones, al_map_rgb(39,36,30), CASILLA*1.5 + 10, CASILLA*3 +50, 0, "3. No se salga del tablero.");
+        al_draw_text(instrucciones, al_map_rgb(39,36,30), CASILLA*1.5 + 10, CASILLA*3 +70, 0, "4. Si no acepta una palabra.");
+        al_draw_text(instrucciones, al_map_rgb(39,36,30), CASILLA*1.5 + 20, CASILLA*3 +90, 0, "de click nuevamente.");
+        al_draw_text(instrucciones, al_map_rgb(39,36,30), CASILLA*1.5 + 10, CASILLA*3 +110, 0, "5. Use las flechas para ajustar la direccion.");
+        al_draw_text(instrucciones, al_map_rgb(39,36,30), CASILLA*1.5 + 10, CASILLA*3 +130, 0, "6. Presione enter para mandar la palabra.");
+        al_draw_text(instrucciones, al_map_rgb(39,36,30), CASILLA*1.5 + 10, CASILLA*3 +150, 0, "7. No se aceptan palabras repetidas.");
+        al_flip_display();
+        al_destroy_font(instrucciones);
+    }
 }
