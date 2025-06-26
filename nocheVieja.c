@@ -3,49 +3,48 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 #include <allegro5/allegro_primitives.h>
-#include <iostream>
 #include <stdio.h>
-
-using namespace std;
+#include <stdlib.h>
+#include <string.h>
 
 const int MAX_HORAS = 1000; // maximo de horas que se pueden almacenar
 
 // estructura para almacenar hora y minuto
-struct HoraMinuto {
+typedef struct {
     int hora;
     int minuto;
-};
+} HoraMinuto;
 
 // estructura para crear botones interactivos
-struct Boton {
+typedef struct {
     int x, y, w, h;          // posicion y dimensiones
     const char* texto;        // texto del boton
     ALLEGRO_COLOR color_fondo; // color de fondo
     ALLEGRO_COLOR color_texto; // color del texto
+} Boton;
 
-    // verifica si un punto (px,py) esta dentro del boton
-    bool contiene(int px, int py)
-    {
-        return px >= x && px <= x + w && py >= y && py <= y + h;
-    }
+// verifica si un punto (px,py) esta dentro del boton
+int boton_contiene(Boton* b, int px, int py)
+{
+    return px >= b->x && px <= b->x + b->w && py >= b->y && py <= b->y + b->h;
+}
 
-    // dibuja el boton en pantalla
-    void dibujar(ALLEGRO_FONT* fuente)
-    {
-        al_draw_filled_rectangle(x, y, x + w, y + h, color_fondo);
-        al_draw_rectangle(x, y, x + w, y + h, al_map_rgb(0, 0, 0), 2);
-        int th = al_get_font_line_height(fuente);
-        al_draw_text(fuente, color_texto, x + w / 2.0f, y + h / 2.0f - th / 2.0f,
-            ALLEGRO_ALIGN_CENTRE, texto);
-    }
-};
+// dibuja el boton en pantalla
+void boton_dibujar(Boton* b, ALLEGRO_FONT* fuente)
+{
+    al_draw_filled_rectangle(b->x, b->y, b->x + b->w, b->y + b->h, b->color_fondo);
+    al_draw_rectangle(b->x, b->y, b->x + b->w, b->y + b->h, al_map_rgb(0, 0, 0), 2);
+    int th = al_get_font_line_height(fuente);
+    al_draw_text(fuente, b->color_texto, b->x + b->w / 2.0f, b->y + b->h / 2.0f - th / 2.0f,
+        ALLEGRO_ALIGN_CENTRE, b->texto);
+}
 
 int main()
 {
     // inicializacion de allegro y sus componentes
     if (!al_init())
     {
-        cout << "error al inicializar allegro" << endl;
+        printf("error al inicializar allegro\n");
         return -1;
     }
     al_init_font_addon();      // soporte para fuentes
@@ -58,7 +57,7 @@ int main()
     ALLEGRO_DISPLAY* display = al_create_display(ANCHO, ALTO);
     if (!display)
     {
-        cout << "no se pudo crear la ventana" << endl;
+        printf("no se pudo crear la ventana\n");
         return -1;
     }
     al_set_window_title(display, "Noche vieja - minutos para medianoche");
@@ -68,7 +67,7 @@ int main()
     ALLEGRO_FONT* fuente_texto = al_load_ttf_font("arial.ttf", 20, 0);
     if (!fuente_titulo || !fuente_texto)
     {
-        cout << "error al cargar fuentes" << endl;
+        printf("error al cargar fuentes\n");
         al_destroy_display(display);
         return -1;
     }
@@ -77,7 +76,7 @@ int main()
     FILE* archivo = fopen("horas.txt", "r");
     if (!archivo)
     {
-        cout << "error al abrir archivo horas.txt" << endl;
+        printf("error al abrir archivo horas.txt\n");
         al_destroy_display(display);
         return -1;
     }
@@ -102,12 +101,13 @@ int main()
         // almacenar datos validos
         if (cantidad < MAX_HORAS)
         {
-            horas[cantidad] = { h, m };
+            horas[cantidad].hora = h;
+            horas[cantidad].minuto = m;
             cantidad++;
         }
         else
         {
-            cout << "se alcanzo el maximo de horas almacenadas." << endl;
+            printf("se alcanzo el maximo de horas almacenadas.\n");
             break;
         }
     }
@@ -118,7 +118,7 @@ int main()
     {
         50, ALTO - 100, 220, 50,
         "Minutos faltantes",
-        al_map_rgb(70,130,180),   // azul 
+        al_map_rgb(70,130,180),   // azul
         al_map_rgb(255,255,255)   // blanco
     };
 
@@ -126,13 +126,13 @@ int main()
     {
         ANCHO - 150, ALTO - 100, 100, 50,
         "Salir",
-        al_map_rgb(220,20,60),    // rojo 
+        al_map_rgb(220,20,60),    // rojo
         al_map_rgb(255,255,255)   // blanco
     };
 
     // variables de control del programa
-    bool running = true;
-    bool mostrar_minutos = false;
+    int running = 1;
+    int mostrar_minutos = 0;
 
     // configuracion de eventos
     ALLEGRO_EVENT_QUEUE* cola = al_create_event_queue();
@@ -148,15 +148,15 @@ int main()
         {
             if (ev.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
             {
-                running = false;
+                running = 0;
             }
             else if (ev.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN)
             {
                 int x = ev.mouse.x, y = ev.mouse.y;
 
-                if (boton_mostrar.contiene(x, y))
+                if (boton_contiene(&boton_mostrar, x, y))
                 {
-                    mostrar_minutos = true;
+                    mostrar_minutos = 1;
 
                     // abrir archivo para escribir resultados
                     FILE* resultados = fopen("resultados.txt", "w");
@@ -176,9 +176,9 @@ int main()
                         fclose(resultados);
                     }
                 }
-                else if (boton_salir.contiene(x, y))
+                else if (boton_contiene(&boton_salir, x, y))
                 {
-                    running = false;
+                    running = 0;
                 }
             }
         }
@@ -216,8 +216,8 @@ int main()
         }
 
         // dibujar botones
-        boton_mostrar.dibujar(fuente_texto);
-        boton_salir.dibujar(fuente_texto);
+        boton_dibujar(&boton_mostrar, fuente_texto);
+        boton_dibujar(&boton_salir, fuente_texto);
 
         // actualizar pantalla
         al_flip_display();
@@ -232,4 +232,3 @@ int main()
 
     return 0;
 }
-
