@@ -227,7 +227,7 @@ void procesarDatos(char resultados[][100], int* num_resultados) {
 void abrirArchivoSalida() {
 #ifdef _WIN32
     system("start salida.txt");
-#elif __APPLE__
+#elif _APPLE_
     system("open salida.txt");
 #else
     system("xdg-open salida.txt");
