@@ -10,7 +10,7 @@
 #include <allegro5/allegro_ttf.h>
 
 #define MAX_DIGITS 13   // Longitud maxima de un codigo EAN-13
-#define MAX_LINE 32     // Tamaño maximo de linea leida del archivo
+#define MAX_LINE 32     // TamaÃ±o maximo de linea leida del archivo
 
 // Tipo de codigo de barras (EAN-8 o EAN-13)
 typedef enum { EAN8, EAN13 } TipoEAN;
@@ -90,7 +90,7 @@ int main() {
             lista = nuevaLista;
         }
 
-        // Asegurar que el codigo tenga el tamaño correcto rellenando ceros a la izquierda
+        // Asegurar que el codigo tenga el tamaÃ±o correcto rellenando ceros a la izquierda
         completarCeros(&temp);
 
         // Guardar codigo en la lista
@@ -151,13 +151,13 @@ bool leerCodigo(FILE* fin, CodigoBarras* codigo) {
     char linea[MAX_LINE];
     if (!fgets(linea, MAX_LINE, fin)) return false;
 
-    // Eliminar salto de línea
+    // Eliminar salto de lÃ­nea
     linea[strcspn(linea, "\n")] = '\0';
 
-    // Verificar si la línea es exactamente "0"
+    // Verificar si la lÃ­nea es exactamente "0"
     if (strcmp(linea, "0") == 0) return false;
 
-    // Procesar dígitos como antes
+    // Procesar dÃ­gitos como antes
     int j = 0;
     for (int i = 0; linea[i] != '\0'; ++i) {
         if (linea[i] >= '0' && linea[i] <= '9') {
