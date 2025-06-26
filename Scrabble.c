@@ -17,6 +17,7 @@
 #define CASILLA 60 // Dimensiones para una casilla
 #define TAM 9 // Tamaño del tablero TAM*TAM
 #define TAM_DICCIONARIO 200
+#define _CRT_SECURE_NO_WARNINGS
 
 const char *diccionario[TAM_DICCIONARIO] = {
     "CASA", "PERRO", "GATO", "RATON", "JUEGO",
@@ -85,6 +86,7 @@ void guardarPartida(struct Juego partida[2]); // Juardamos las palabras y puntos
 void liberar(struct Puntaje **inicio); // Liberamos la memoria reservada de las estructuras
 void convertirPalabra(char *point, int *puntos, int divisor, int *k);
 bool doblePalabra(char *palabra);
+void mostrarMarcador(struct Juego partida[2], ALLEGRO_FONT *texto);
 
 // Funciones para saber si es una casilla especial
 bool esTriplePalabra(int y, int x);
@@ -113,6 +115,8 @@ int main(){
     enum Orientacion o = DERECHA; // Declaramos una variable enumeracion para guardar la orientacion
     enum Jugador player = PRIMERO; // Turno del jugador
     struct Juego partida[2];
+    char *point = (char*)calloc(30,sizeof(char)); // Para la funcion convertirPalabra
+    int k = 0, score = 0; // La usamos para la funcion convertiPalabra
     // Inicializamos el marcador en cero
     partida[0].palabras_acumuladas = NULL;
     partida[1].palabras_acumuladas = NULL;
@@ -141,40 +145,6 @@ int main(){
             switch(ev.type){
                 case ALLEGRO_EVENT_DISPLAY_CLOSE: 
                         run = false; // Nos vamos
-                    // MOSTRAMOS EL GANADOR
-                        int x_texto = (TAM-5)/2*CASILLA, y_texto = (TAM-3)/2*CASILLA; // Calculamos las posiciones (x,y) iniciales para dibujar un rectangulo centrado
-                        al_draw_filled_rectangle(x_texto, y_texto, x_texto+(5*CASILLA), y_texto+(3*CASILLA), al_map_rgba(39,30,22, 200)); // Rectangulo centrado
-                        if(partida[0].puntaje_total > partida[1].puntaje_total){ // Anunciamos al ganador
-                            al_draw_text(texto, al_map_rgb(255,255,255), x_texto, y_texto+CASILLA, 0, "GANA JUGADOR 1");
-                        }else{
-                            if(partida[0].puntaje_total < partida[1].puntaje_total){
-                                al_draw_text(texto, al_map_rgb(255,255,255), x_texto, y_texto+CASILLA, 0, "GANA JUGADOR 2");
-                            }else{
-                                al_draw_text(texto, al_map_rgb(255,255,255), x_texto+20, y_texto+CASILLA, 0, "SIN GANADOR");
-                            }
-                        }
-
-                        ALLEGRO_FONT *archivo = al_create_builtin_font();
-                        int i=0, j =0, puntaje1 = partida[0].puntaje_total, puntaje2 = partida[1].puntaje_total;
-                        char *jugador1 = (char*)calloc(30, sizeof(char));
-                        char *jugador2 = (char*)calloc(30, sizeof(char));
-                        convertirPalabra(jugador1, &puntaje1, 1, &i);
-                        convertirPalabra(jugador2, &puntaje2, 1, &j);
-                        al_draw_text(archivo, al_map_rgb(255,255,255), x_texto+20, y_texto+100+CASILLA, 0, "Guardado en Scrabble_Score.txt");
-                        al_draw_text(archivo, al_map_rgb(255,255,255), x_texto+20, y_texto+60+CASILLA, 0, "JUGADOR 1:");
-                        al_draw_text(archivo, al_map_rgb(255,255,255), x_texto+20, y_texto+80+CASILLA, 0, "JUGADOR 2:");
-                        al_draw_text(archivo, al_map_rgb(255,255,255), x_texto+120, y_texto+60+CASILLA, 0, jugador1);
-                        al_draw_text(archivo, al_map_rgb(255,255,255), x_texto+120, y_texto+80+CASILLA, 0, jugador2);
-                        al_flip_display();
-                        al_rest(3.0); // Dejamos el resultado en pantalla por 3 sec
-
-                        al_destroy_font(archivo);
-                        free(jugador1);
-                        free(jugador2);
-                        free(palabra); // Liberamos palabra
-                        guardarPartida(partida); // Guardamos los reusltados en un archivo .txt
-                        liberar(&partida[0].palabras_acumuladas); // Liberamos la memoria reservada
-                        liberar(&partida[1].palabras_acumuladas); // Liberamos la memoria reservada
                         al_flush_event_queue(evento);
                     break;
 
@@ -207,8 +177,7 @@ int main(){
                 case ALLEGRO_EVENT_KEY_CHAR: // letras
                         if(escribir){
                             if(ev.keyboard.unichar == '\b'){
-                                int len = strlen(palabra);
-                                palabra[len-1] = '\0'; // Borramos
+                                palabra[strlen(palabra)-1] = '\0'; // Borramos
                                 al_flush_event_queue(evento);
                                 break;
                             }
@@ -216,17 +185,19 @@ int main(){
                             if(ev.keyboard.unichar == '\n' || ev.keyboard.unichar == '\r'){ // Cuando el usuario presione enter, significa que termino de escribir
                                 if(colocarPalabra(tablero, columna, fila, o, palabra, &puntos)){ // Colocamos la palabra
                                     guardarPalabra(palabra);
-                                    char *point = (char*)calloc(30, sizeof(char));
-                                    int k = 0, score = puntos;
+                                    *point = '\0';
+                                    k = 0;
+                                    score = puntos;
                                     point[k++] = '+';
                                     convertirPalabra(point, &score, 1, &k);
+                                    
+                                    printf("\ntodo bien\n");
                                     for(int i=0; i<10; i++){
                                         mostrarTablero(tablero, texto, columna, fila, palabra, o, player);
                                         al_draw_text(texto, al_map_rgb(255,255,255), 5*CASILLA, (5*CASILLA) - (i*10), 0, point);
                                         al_flip_display();
                                         al_rest(0.1);
                                     }
-                                    free(point);
                                     
                                     switch(player){ // cambiamos de turno y agregamos la palabra y sus puntos al jugador correspondiente
                                         case PRIMERO: 
@@ -266,14 +237,11 @@ int main(){
                                 puntos = 0; // Reiniciamos el conteo
                                 escribir = false; // Salimos del modo escritura
                             }else{ // Agregamos una letra dada por el usuario 
-                                int cont=0;
-                                while(palabra[cont] != '\0'){
-                                    cont++;
-                                }
+
                                 if(ev.keyboard.unichar >= 97 && ev.keyboard.unichar <= 122){
                                     ev.keyboard.unichar -= 32;
                                 }
-                                palabra[cont] = ev.keyboard.unichar;
+                                palabra[strlen(palabra)] = ev.keyboard.unichar;
                                 mostrarTablero(tablero, texto, columna, fila, palabra, o, player); // Mostramos "palabra" actualizada en el tablero
                             }
                         }
@@ -282,7 +250,17 @@ int main(){
         }
     }
 
+    // Mostramos el marcador
+    mostrarMarcador(partida, texto);
+
+    //Guardamos la partida
+    guardarPartida(partida); // Guardamos los reusltados en un archivo .txt
+    
     // Liberamos los punteros
+    free(palabra);
+    free(point);
+    liberar(&partida[0].palabras_acumuladas); // Liberamos la memoria reservada
+    liberar(&partida[1].palabras_acumuladas); // Liberamos la memoria reservada
     al_uninstall_keyboard();
     al_destroy_display(display);
     al_destroy_event_queue(evento);
@@ -323,7 +301,7 @@ bool colocarPalabra (char tablero[TAM][TAM], int x, int y, enum Orientacion o, c
         al_draw_filled_rectangle(x_texto, y_texto, x_texto+(5*CASILLA), y_texto+(3*CASILLA), al_map_rgba(39,30,22, 160)); // Rectangulo centrado
         al_draw_text(no_es_Palabra, al_map_rgb(255,255,255), x_texto+(1.5*CASILLA), y_texto+(1.5*CASILLA), 0, "Palabra no Valida."); // Mensaje centrado
         al_flip_display();
-        al_rest(2.0);
+        al_rest(1.0);
         al_destroy_font(no_es_Palabra);
         return false; // La palabra no esta en el diccionario del juego
     }
@@ -629,3 +607,34 @@ bool doblePalabra(char *palabra){
         return false;
     }
 
+void mostrarMarcador(struct Juego partida[2], ALLEGRO_FONT *texto){
+    int x_texto = (TAM-5)/2*CASILLA, y_texto = (TAM-3)/2*CASILLA; // Calculamos las posiciones (x,y) iniciales para dibujar un rectangulo centrado
+    al_draw_filled_rectangle(x_texto, y_texto, x_texto+(5*CASILLA), y_texto+(3*CASILLA), al_map_rgba(39,30,22, 200)); // Rectangulo centrado
+    if(partida[0].puntaje_total > partida[1].puntaje_total){ // Anunciamos al ganador
+        al_draw_text(texto, al_map_rgb(255,255,255), x_texto, y_texto+CASILLA, 0, "GANA JUGADOR 1");
+    }else{
+        if(partida[0].puntaje_total < partida[1].puntaje_total){
+            al_draw_text(texto, al_map_rgb(255,255,255), x_texto, y_texto+CASILLA, 0, "GANA JUGADOR 2");
+        }else{
+            al_draw_text(texto, al_map_rgb(255,255,255), x_texto+20, y_texto+CASILLA, 0, "SIN GANADOR");
+        }
+    }
+
+    ALLEGRO_FONT *archivo = al_create_builtin_font();
+    int i=0, j =0, puntaje1 = partida[0].puntaje_total, puntaje2 = partida[1].puntaje_total;
+    char *jugador1 = (char*)calloc(30, sizeof(char));
+    char *jugador2 = (char*)calloc(30, sizeof(char));
+    convertirPalabra(jugador1, &puntaje1, 1, &i);
+    convertirPalabra(jugador2, &puntaje2, 1, &j);
+    al_draw_text(archivo, al_map_rgb(255,255,255), x_texto+20, y_texto+100+CASILLA, 0, "Guardado en Scrabble_Score.txt");
+    al_draw_text(archivo, al_map_rgb(255,255,255), x_texto+20, y_texto+60+CASILLA, 0, "JUGADOR 1:");
+    al_draw_text(archivo, al_map_rgb(255,255,255), x_texto+20, y_texto+80+CASILLA, 0, "JUGADOR 2:");
+    al_draw_text(archivo, al_map_rgb(255,255,255), x_texto+120, y_texto+60+CASILLA, 0, jugador1);
+    al_draw_text(archivo, al_map_rgb(255,255,255), x_texto+120, y_texto+80+CASILLA, 0, jugador2);
+    al_flip_display();
+    al_rest(2.0); // Dejamos el resultado en pantalla por 3 sec
+
+    al_destroy_font(archivo);
+    free(jugador1);
+    free(jugador2);
+}
